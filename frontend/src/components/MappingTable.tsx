@@ -1,16 +1,17 @@
 import { Plus, Trash2, Upload } from 'lucide-react'
-import type { CredentialEntry } from '../types'
+import type { CredentialEntry, CredentialNodeOption } from '../types'
 
 type Props = {
   entries: CredentialEntry[]
   onChange: (entries: CredentialEntry[]) => void
+  nodeOptions?: CredentialNodeOption[]
 }
 
 function emptyEntry(): CredentialEntry {
   return { nodeName: '', credentialName: '', credentialId: '' }
 }
 
-export function MappingTable({ entries, onChange }: Props) {
+export function MappingTable({ entries, onChange, nodeOptions = [] }: Props) {
   function updateRow(index: number, key: keyof CredentialEntry, value: string) {
     const next = entries.map((entry, i) => (i === index ? { ...entry, [key]: value } : entry))
     onChange(next)
@@ -81,12 +82,16 @@ export function MappingTable({ entries, onChange }: Props) {
               {entries.map((entry, index) => (
                 <tr key={index}>
                   <td className="px-4 py-3">
-                    <input
+                    <select
                       className="cm-input"
                       value={entry.nodeName}
                       onChange={(event) => updateRow(index, 'nodeName', event.target.value)}
-                      placeholder="Execute a SQL query"
-                    />
+                    >
+                      <option value="">Pilih node...</option>
+                      {nodeOptions.map((option) => (
+                        <option key={option.label} value={option.nodeName}>{option.label}</option>
+                      ))}
+                    </select>
                   </td>
                   <td className="px-4 py-3">
                     <input

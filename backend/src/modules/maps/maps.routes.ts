@@ -9,7 +9,7 @@ import { auditService } from '../audit/audit.service.js'
 import { draftService, type DraftPayload } from '../drafts/draft.service.js'
 import { gitService } from '../git/git.service.js'
 import { CommitSchema, MapMutationSchema } from './map.schema.js'
-import { assertMapScope, extractSelectedSubworkflowIds, mergeValidationResponses, validateCredentialMap } from './validation.js'
+import { assertMapScope, extractCredentialNodeOptions, extractSelectedSubworkflowIds, mergeValidationResponses, validateCredentialMap } from './validation.js'
 
 const branchLocks = new Set<string>()
 
@@ -115,7 +115,8 @@ export async function registerMapRoutes(app: FastifyInstance) {
       type: 'main',
       path: gitService.credentialMapPath(workflowId),
       exists: mainMap.entries.length > 0,
-      map: mainMap
+      map: mainMap,
+      credentialNodeOptions: extractCredentialNodeOptions(workflow)
     })
 
     const selectedSubworkflows = []
@@ -132,7 +133,8 @@ export async function registerMapRoutes(app: FastifyInstance) {
         type: 'subworkflow',
         path: gitService.credentialMapPath(subId),
         exists: subMap.entries.length > 0,
-        map: subMap
+        map: subMap,
+        credentialNodeOptions: extractCredentialNodeOptions(subWorkflow)
       })
     }
 
