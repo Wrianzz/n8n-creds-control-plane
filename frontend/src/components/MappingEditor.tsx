@@ -233,6 +233,7 @@ export function MappingEditor({ branch, onBack }: Props) {
           {activeMap ? (
             <MappingTable
               entries={activeMap.map.entries}
+              nodeOptions={activeMap.credentialNodeOptions ?? []}
               onChange={(entries) => updateEntries(activeMap.workflowId, entries)}
             />
           ) : (
