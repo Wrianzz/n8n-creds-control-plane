@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  viewer
+  editor
+  approver
+  admin
+}
+
+enum ScopeType {
+  global
+  branch
+  workflow
+}
+
+enum DraftStatus {
+  draft
+  committed
+  discarded
+}
+
+enum BranchStatus {
+  active
+  missing_remote
+  conflict
+  archived
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  provider  String?
+  roles     UserRoleMap[]
+  drafts    MappingDraft[] @relation("DraftCreatedBy")
+  audits    AuditLog[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model UserRoleMap {
+  id         String    @id @default(cuid())
+  userId     String
+  role       UserRole
+  scopeType  ScopeType @default(global)
+  scopeValue String?
+  user       User      @relation(fields: [userId], references: [id])
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([scopeType, scopeValue])
+}
+
+model BranchCache {
+  id           String       @id @default(cuid())
+  branchName   String       @unique
+  workflowId   String
+  headSha      String
+  status       BranchStatus @default(active)
+  lastSyncedAt DateTime     @default(now())
+
+  @@index([workflowId])
+}
+
+model WorkflowCache {
+  id                     String   @id @default(cuid())
+  workflowId              String
+  branchName              String
+  workflowName            String?
+  path                    String
+  selectedSubworkflowIds  Json     @default("[]")
+  lastReadSha             String?
+  updatedAt               DateTime @updatedAt
+
+  @@index([workflowId])
+  @@index([branchName])
+}
+
+model MappingDraft {
+  id                     String      @id @default(cuid())
+  branchName             String
+  workflowId              String
+  selectedSubworkflowIds  Json        @default("[]")
+  mapJson                 Json
+  baseSha                 String?
+  contentHash             String
+  status                  DraftStatus @default(draft)
+  version                 Int         @default(1)
+  createdById             String
+  updatedById             String?
+  createdBy               User        @relation("DraftCreatedBy", fields: [createdById], references: [id])
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+
+  @@index([branchName, workflowId])
+  @@index([status])
+}
+
+model MappingCommit {
+  id          String   @id @default(cuid())
+  branchName  String
+  workflowId   String
+  draftId     String?
+  commitSha   String
+  baseSha     String?
+  filesChanged Json
+  committedBy String
+  committedAt DateTime @default(now())
+
+  @@index([branchName, workflowId])
+  @@index([commitSha])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String?
+  actorEmail  String
+  action      String
+  branchName  String?
+  workflowId  String?
+  targetPath  String?
+  beforeHash  String?
+  afterHash   String?
+  commitSha   String?
+  diffJson    Json?
+  metadata    Json?
+  traceId     String
+  ipAddress   String?
+  userAgent   String?
+  actor       User?    @relation(fields: [actorId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([branchName, workflowId])
+  @@index([actorEmail])
+  @@index([createdAt])
+}
