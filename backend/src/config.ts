@@ -12,11 +12,10 @@ const EnvSchema = z.object({
   N8N_API_BASE_URL: z.string().optional(),
   N8N_API_KEY: z.string().optional(),
   N8N_ALLOW_SELF_SIGNED_TLS: z.coerce.boolean().default(false),
-  AUTH_MODE: z.enum(['dev', 'keycloak']).default('dev'),
-  OIDC_ISSUER_URL: z.string().optional(),
-  OIDC_AUDIENCE: z.string().optional(),
-  OIDC_CLIENT_ID: z.string().optional(),
-  OIDC_CLIENT_SECRET: z.string().optional()
+  OIDC_ISSUER_URL: z.string().min(1, 'OIDC_ISSUER_URL wajib diisi'),
+  OIDC_AUDIENCE: z.string().min(1, 'OIDC_AUDIENCE wajib diisi'),
+  OIDC_CLIENT_ID: z.string().min(1, 'OIDC_CLIENT_ID wajib diisi'),
+  OIDC_CLIENT_SECRET: z.string().min(1, 'OIDC_CLIENT_SECRET wajib diisi')
 })
 
 export const config = EnvSchema.parse(process.env)

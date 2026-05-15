@@ -75,18 +75,10 @@ Buka:
 http://localhost:5173
 ```
 
-## Auth Mode
+## Auth (Keycloak Only)
 
-Default mode backend adalah `AUTH_MODE=dev`.
-
-Untuk development, frontend bisa mengirim header:
-
-```txt
-x-user-email: operator@example.com
-x-user-role: editor
-```
-
-Untuk production dengan Keycloak, gunakan `AUTH_MODE=keycloak`.
+Backend sekarang **hanya** menerima autentikasi via Keycloak Bearer token.
+Header development (`x-user-email`, `x-user-role`) sudah tidak digunakan.
 
 ### Step-by-step setup SSO Keycloak + RBAC
 
@@ -108,12 +100,13 @@ Untuk production dengan Keycloak, gunakan `AUTH_MODE=keycloak`.
    - Tambahkan environment variables berikut:
 
 ```env
-AUTH_MODE=keycloak
 OIDC_ISSUER_URL=https://<keycloak-host>/realms/<realm-name>
 OIDC_CLIENT_ID=ccp-backend
 OIDC_CLIENT_SECRET=<client-secret>
 OIDC_AUDIENCE=ccp-backend
 ```
+
+> `AUTH_MODE` tidak lagi dipakai backend. Variable boleh dihapus dari environment.
 
 5. **Jalankan backend**
    - `cd backend && npm run dev`
