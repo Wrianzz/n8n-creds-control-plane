@@ -61,6 +61,15 @@ export function MappingTable({ entries, onChange, nodeOptions = [], credentials 
               {entries.map((entry, index) => {
                 const nodeType = nodeTypeByName.get(entry.nodeName) ?? ''
                 const filteredCredentials = credentials.filter((item) => item.type === nodeType)
+                const selectedByOtherRows = new Set(
+                  entries
+                    .filter((_, rowIndex) => rowIndex !== index)
+                    .map((item) => item.nodeName)
+                    .filter(Boolean)
+                )
+                const availableNodeOptions = nodeOptions.filter(
+                  (option) => option.nodeName === entry.nodeName || !selectedByOtherRows.has(option.nodeName)
+                )
 
                 return (
                   <tr key={index}>
@@ -74,8 +83,8 @@ export function MappingTable({ entries, onChange, nodeOptions = [], credentials 
                         }}
                       >
                         <option value="">Pilih node...</option>
-                        {nodeOptions.map((option) => (
-                          <option key={option.label} value={option.nodeName}>{option.label}</option>
+                        {availableNodeOptions.map((option) => (
+                          <option key={option.nodeName} value={option.nodeName}>{option.label}</option>
                         ))}
                       </select>
                     </td>
