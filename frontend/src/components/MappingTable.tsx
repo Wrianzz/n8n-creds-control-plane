@@ -15,16 +15,21 @@ function emptyEntry(): CredentialEntry {
 export function MappingTable({ entries, onChange, nodeOptions = [], credentials = [] }: Props) {
   const nodeTypeByName = new Map(nodeOptions.map((option) => [option.nodeName, option.credentialType]))
 
-  function updateRow(index: number, key: keyof CredentialEntry, value: string) {
-    const next = entries.map((entry, i) => (i === index ? { ...entry, [key]: value } : entry))
-    onChange(next)
-  }
 
   function updateCredential(index: number, credentialId: string) {
     const selected = credentials.find((item) => item.id === credentialId)
     const next = entries.map((entry, i) => (
       i === index
         ? { ...entry, credentialId: selected?.id ?? '', credentialName: selected?.name ?? '' }
+        : entry
+    ))
+    onChange(next)
+  }
+
+  function updateNode(index: number, nodeName: string) {
+    const next = entries.map((entry, i) => (
+      i === index
+        ? { ...entry, nodeName, credentialId: '', credentialName: '' }
         : entry
     ))
     onChange(next)
@@ -61,6 +66,15 @@ export function MappingTable({ entries, onChange, nodeOptions = [], credentials 
               {entries.map((entry, index) => {
                 const nodeType = nodeTypeByName.get(entry.nodeName) ?? ''
                 const filteredCredentials = credentials.filter((item) => item.type === nodeType)
+                const selectedByOtherRows = new Set(
+                  entries
+                    .filter((_, rowIndex) => rowIndex !== index)
+                    .map((item) => item.nodeName)
+                    .filter(Boolean)
+                )
+                const availableNodeOptions = nodeOptions.filter(
+                  (option) => option.nodeName === entry.nodeName || !selectedByOtherRows.has(option.nodeName)
+                )
 
                 return (
                   <tr key={index}>
@@ -68,14 +82,11 @@ export function MappingTable({ entries, onChange, nodeOptions = [], credentials 
                       <select
                         className="cm-input"
                         value={entry.nodeName}
-                        onChange={(event) => {
-                          updateRow(index, 'nodeName', event.target.value)
-                          updateCredential(index, '')
-                        }}
+                        onChange={(event) => updateNode(index, event.target.value)}
                       >
                         <option value="">Pilih node...</option>
-                        {nodeOptions.map((option) => (
-                          <option key={option.label} value={option.nodeName}>{option.label}</option>
+                        {availableNodeOptions.map((option) => (
+                          <option key={option.nodeName} value={option.nodeName}>{option.label}</option>
                         ))}
                       </select>
                     </td>

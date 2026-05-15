@@ -21,6 +21,7 @@ function cleanEntries(entries: CredentialEntry[]): CredentialEntry[] {
 export function MappingEditor({ branch, onBack }: Props) {
   const [data, setData] = useState<WorkflowMapResponse | null>(null)
   const [map, setMap] = useState<MapItem | null>(null)
+  const [originalMap, setOriginalMap] = useState<MapItem | null>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -32,8 +33,10 @@ export function MappingEditor({ branch, onBack }: Props) {
     setMessage(null)
     try {
       const result = await api.getWorkflowMap(branch.branchName, branch.workflowId)
+      const selectedMap = result.maps.find((item) => item.workflowId === branch.workflowId) ?? result.maps[0] ?? null
       setData(result)
-      setMap(result.maps.find((item) => item.workflowId === branch.workflowId) ?? result.maps[0] ?? null)
+      setMap(selectedMap ? structuredClone(selectedMap) : null)
+      setOriginalMap(selectedMap ? structuredClone(selectedMap) : null)
       setCommitResult(null)
     } catch (err: any) {
       setError(err.message)
@@ -71,7 +74,7 @@ export function MappingEditor({ branch, onBack }: Props) {
     }
   }
 
-  const beforeJson = useMemo(() => (map ? { [map.workflowId]: map.map } : null), [map])
+  const beforeJson = useMemo(() => (originalMap ? { [originalMap.workflowId]: originalMap.map } : null), [originalMap])
   const afterJson = useMemo(() => (map ? { [map.workflowId]: { entries: cleanEntries(map.map.entries) } } : null), [map])
 
   return (
