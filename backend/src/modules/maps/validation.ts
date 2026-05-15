@@ -98,6 +98,36 @@ function issue(input: ValidationIssue): ValidationIssue {
   return input
 }
 
+
+export type CredentialNodeOption = {
+  nodeName: string
+  credentialType: string
+  label: string
+}
+
+export function extractCredentialNodeOptions(rawWorkflow: unknown): CredentialNodeOption[] {
+  const nodes = extractWorkflowNodes(rawWorkflow)
+  const options: CredentialNodeOption[] = []
+
+  for (const node of nodes) {
+    const nodeName = normalizeName(node?.name)
+    if (!nodeName) continue
+
+    const credentialTypes = Object.keys(node.credentials ?? {})
+    if (credentialTypes.length === 0) continue
+
+    for (const credentialType of credentialTypes) {
+      options.push({
+        nodeName,
+        credentialType,
+        label: `${nodeName} - ${credentialType}`
+      })
+    }
+  }
+
+  return options
+}
+
 export function validateCredentialMap(input: {
   workflowId: string
   workflow: N8nWorkflow | unknown

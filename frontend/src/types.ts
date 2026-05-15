@@ -15,6 +15,13 @@ export type CredentialMap = {
   entries: CredentialEntry[]
 }
 
+
+export type CredentialNodeOption = {
+  nodeName: string
+  credentialType: string
+  label: string
+}
+
 export type MapItem = {
   workflowId: string
   type: 'main' | 'subworkflow'
@@ -22,6 +29,13 @@ export type MapItem = {
   exists: boolean
   map: CredentialMap
   included?: boolean
+  credentialNodeOptions?: CredentialNodeOption[]
+}
+
+export type N8nCredentialOption = {
+  id: string
+  name: string
+  type: string
 }
 
 export type WorkflowMapResponse = {
@@ -40,6 +54,7 @@ export type WorkflowMapResponse = {
     path: string
   }>
   maps: MapItem[]
+  credentials?: N8nCredentialOption[]
 }
 
 export type ValidationIssue = {

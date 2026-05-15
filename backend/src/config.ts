@@ -8,7 +8,9 @@ const EnvSchema = z.object({
   GIT_REMOTE: z.string().default('origin'),
   ALLOWED_BRANCH_REGEX: z.string().default('^workflow/[A-Za-z0-9_-]+$'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  DATABASE_URL: z.string().optional()
+  DATABASE_URL: z.string().optional(),
+  N8N_API_BASE_URL: z.string().optional(),
+  N8N_API_KEY: z.string().optional()
 })
 
 export const config = EnvSchema.parse(process.env)
