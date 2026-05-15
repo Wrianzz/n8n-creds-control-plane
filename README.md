@@ -49,6 +49,17 @@ Edit `.env`:
 REPO_PATH=/absolute/path/to/n8n-workflow-repo
 ```
 
+Jika n8n API menggunakan sertifikat self-signed (misalnya dev/staging internal), aktifkan mode bypass TLS backend:
+
+```env
+N8N_API_BASE_URL=https://n8n.internal/api/v1
+N8N_API_KEY=your_api_key
+N8N_ALLOW_SELF_SIGNED_TLS=true
+```
+
+> ⚠️ Gunakan `N8N_ALLOW_SELF_SIGNED_TLS=true` hanya untuk development/internal network. Untuk production, gunakan sertifikat CA yang valid.
+
+
 ### Frontend
 
 ```bash
