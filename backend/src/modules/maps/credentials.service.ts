@@ -15,6 +15,12 @@ class CredentialsService {
     if (!config.N8N_API_BASE_URL || !config.N8N_API_KEY) return []
 
     const base = config.N8N_API_BASE_URL.replace(/\/$/, '')
+
+    if (config.N8N_ALLOW_SELF_SIGNED_TLS) {
+      // Development-only escape hatch for internal/self-signed certificates
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    }
+
     const res = await fetch(`${base}/credentials`, {
       headers: {
         'X-N8N-API-KEY': config.N8N_API_KEY,
