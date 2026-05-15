@@ -75,13 +75,51 @@ Buka:
 http://localhost:5173
 ```
 
-## Dev Auth
+## Auth (Keycloak Only)
 
-Untuk development, frontend mengirim header:
+Backend sekarang **hanya** menerima autentikasi via Keycloak Bearer token.
+Header development (`x-user-email`, `x-user-role`) sudah tidak digunakan.
 
-```txt
-x-user-email: operator@example.com
-x-user-role: editor
+### Step-by-step setup SSO Keycloak + RBAC
+
+1. **Buat Realm dan Client di Keycloak**
+   - Realm contoh: `n8n-control-plane`
+   - Client backend (confidential) contoh: `ccp-backend`
+   - Aktifkan service account jika diperlukan untuk introspection.
+
+2. **Buat role RBAC di Keycloak**
+   - `ccp_editor`
+   - `ccp_approver`
+   - `ccp_admin`
+   - User tanpa role di atas akan dianggap `viewer`.
+
+3. **Assign role ke user/group**
+   - Gunakan realm roles atau client roles pada client yang sesuai.
+
+4. **Isi konfigurasi backend**
+   - Tambahkan environment variables berikut:
+
+```env
+OIDC_ISSUER_URL=https://<keycloak-host>/realms/<realm-name>
+OIDC_CLIENT_ID=ccp-backend
+OIDC_CLIENT_SECRET=<client-secret>
+OIDC_AUDIENCE=ccp-backend
 ```
 
-Production: ganti `backend/src/plugins/auth.ts` ke OIDC/JWT/SSO.
+> `AUTH_MODE` tidak lagi dipakai backend. Variable boleh dihapus dari environment.
+
+5. **Jalankan backend**
+   - `cd backend && npm run dev`
+   - Backend akan menolak request tanpa `Authorization: Bearer <token>`.
+
+6. **Integrasi frontend ke login Keycloak**
+   - Frontend login ke Keycloak (Authorization Code + PKCE).
+   - Kirim access token ke backend via header `Authorization`.
+
+7. **Verifikasi RBAC**
+   - Endpoint yang butuh `editor` seperti `/api/workflow-maps/commit` akan otomatis mengecek role lewat `requireRole`.
+   - Mapping role internal:
+     - `ccp_admin` -> `admin`
+     - `ccp_approver` -> `approver`
+     - `ccp_editor` -> `editor`
+     - lainnya -> `viewer`
