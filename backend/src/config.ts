@@ -10,7 +10,8 @@ const EnvSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   DATABASE_URL: z.string().optional(),
   N8N_API_BASE_URL: z.string().optional(),
-  N8N_API_KEY: z.string().optional()
+  N8N_API_KEY: z.string().optional(),
+  N8N_ALLOW_SELF_SIGNED_TLS: z.coerce.boolean().default(false)
 })
 
 export const config = EnvSchema.parse(process.env)
