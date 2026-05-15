@@ -32,6 +32,12 @@ export type MapItem = {
   credentialNodeOptions?: CredentialNodeOption[]
 }
 
+export type N8nCredentialOption = {
+  id: string
+  name: string
+  type: string
+}
+
 export type WorkflowMapResponse = {
   branch: {
     branchName: string
@@ -48,6 +54,7 @@ export type WorkflowMapResponse = {
     path: string
   }>
   maps: MapItem[]
+  credentials?: N8nCredentialOption[]
 }
 
 export type ValidationIssue = {
