@@ -12,10 +12,12 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@fastify/cookie": "^9.4.0",
     "@fastify/cors": "^9.0.1",
     "@prisma/client": "^5.22.0",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
+    "jose": "^6.2.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
